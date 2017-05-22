@@ -2,7 +2,7 @@ var ctx = canvas_grid.getContext('2d');
 var width  = canvas_grid.width;
 var height = canvas_grid.height;
 var cell  = 12;
-var step = 3;
+var step = 4;
 var columns   = width/cell;
 var rows   = height/cell;
 
@@ -30,68 +30,78 @@ function obj(xposition, yposition, color) {
 }
 
 
-function movingObj(xposition, yposition, color) {
+function movingObj(xposition, yposition, color, [LEFT, UP, RIGHT, DOWN]) {
 
 
 	object = new obj(xposition, yposition, color);
 
 
-	object.cellUp = function() {
-		this.clearCell();
-		this.yposition -= step;
-		this.fillCell();
+	object.move = function(DIRECTION) {
+
+		if (!validMovement(DIRECTION)) {
+			return
+		}
+		
+		object.clearCell();
+
+		switch (DIRECTION) {
+			case LEFT: object.xposition -= step; break // LEFT
+			case UP: object.yposition -= step; break // UP
+			case RIGHT: object.xposition += step; break // RIGHT
+			case DOWN: object.yposition += step; break // DOWN
+		}
+
+		object.fillCell();
 	}
 
 
-	object.cellDown = function() {
-		this.clearCell();
-		this.yposition += step;
-		this.fillCell();
+	function validMovement(DIRECTION) {
+
+		for (i = 0; i < 64; i++) {
+			if (collide(walls[i], DIRECTION)) {
+				return false
+			}
+		}
+		return true
 	}
 
 
-	object.cellLeft = function() {
-		this.clearCell();
-		this.xposition -= step;
-		this.fillCell();
+	object.keyBinding = function(event) {
+		
+		DIRECTION = event.keyCode;
+		object.move(DIRECTION);
+
 	}
+	window.addEventListener("keydown", object.keyBinding, true)
 
 
-	object.cellRight = function() {
-		this.clearCell();
-		this.xposition += step;
-		this.fillCell();
+	function collide(obj, DIRECTION) {
+
+		x1 = object.xposition;
+		x2 = obj.xposition;
+		y1 = object.yposition;
+		y2 = obj.yposition;
+
+		switch (DIRECTION) {
+			case LEFT: x1 -= step; break // LEFT
+			case UP: y1 -= step; break // UP
+			case RIGHT: x1 += step; break // RIGHT
+			case DOWN: y1 += step; break // DOWN
+		}
+
+		if (x1+cell>x2 && x1<x2+cell) {
+			if (y1+cell>y2 && y1<y2+cell) {	
+				return true
+			}
+		}
+
+		return false
 	}
 
 	return object
 
 }
 
-
-function collide(obj1, obj2) {
-	
-	if (obj1.xposition+cell>obj2.xposition && obj1.xposition<obj2.xposition+cell) {
-		if (obj1.yposition+cell>obj2.yposition && obj1.yposition<obj2.yposition+cell) {	
-			console.log(true)
-		}
-	}
-}
-
-
-function keyBinding(event) {
-	switch (event.keyCode) {
-        case 37: a.cellLeft(); break // LEFT
-        case 38: a.cellUp(); break // UP
-        case 39: a.cellRight(); break // RIGHT
-        case 40: a.cellDown(); break // DOWN
-    }
-    collide(a, b)
-}
-
-
-a = new movingObj(0, 0, '#abffab');
-
-window.addEventListener("keydown", keyBinding, true)
 
 walls = []
 for (i = 0; i < 64; i++) {
@@ -100,3 +110,12 @@ for (i = 0; i < 64; i++) {
 	walls.push(new obj(wallColumn*cell, wallRow*cell, '#333333'));
 } 
 
+b = new movingObj(100, 100, '#abffab', [65, 87, 68, 83]);
+a = new movingObj(0, 0, '#abffab', [37, 38, 39, 40]);
+a.move(39)
+a.move(39)
+a.move(39)
+a.move(39)
+a.move(39)
+a.move(39)
+a.move(39)
