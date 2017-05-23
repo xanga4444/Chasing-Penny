@@ -101,12 +101,25 @@ function computerPlayer(xposition, yposition, color) {
 	var stepsTaken = 10;
 	setInterval(function(){
 		if (stepsTaken===10) {
-			DIRECTION = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]
+			// DIRECTION = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]
+
+			xDiff = target.xposition - computerMovingObject.xposition
+			yDiff = target.yposition - computerMovingObject.yposition
+			xDiffPrime = Math.abs(xDiff)
+			yDiffPrime = Math.abs(yDiff)
+			if (xDiffPrime>yDiffPrime) {
+				DIRECTION = [xDiff/xDiffPrime, 0]
+			}
+			else {
+				DIRECTION = [0, yDiff/yDiffPrime]
+			}
+			
 			stepsTaken = 0;
 		}
 		computerMovingObject.move(DIRECTION)
 		stepsTaken++;
-	}, 10);
+
+	}, 50);
 
 	return computerMovingObject
 
@@ -140,6 +153,7 @@ for (i = 0; i < 64; i++) {
 	wallColumn = Math.floor((Math.random() * columns) + 1)
 	wallRow = Math.floor((Math.random() * rows) + 1)
 	walls.push(new obj(wallColumn*cell, wallRow*cell, '#333333'));
-} 
+}
 
-penny = new computerPlayer(100, 100, '#abffab');
+target = new obj(300, 300, '#FF0000')
+penny = new computerPlayer(100, 150, '#abffab');
