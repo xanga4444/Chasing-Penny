@@ -34,7 +34,7 @@ function obj(xposition, yposition, color) {
 
 function movingObj(xposition, yposition, color) {
 
-	object = new obj(xposition, yposition, color);
+	var object = new obj(xposition, yposition, color);
 
 	object.move = function(DIRECTION) {
 
@@ -52,16 +52,16 @@ function movingObj(xposition, yposition, color) {
 	}
 
 	function validMovement(DIRECTION) {
-
+		console.log(DIRECTION, UP, [0,-1]===[0,-1])
 		switch (DIRECTION) {
-			case LEFT: if (object.xposition===0) {return false} break;
-			case UP: if (object.yposition===0) {return false} break;
+			case LEFT: if (object.xposition<=0) {return false} break;
+			case UP: if (object.yposition<=0) {return false} break;
 			case RIGHT: if (object.xposition+cell===width) {return false} break;
 			case DOWN: if (object.yposition+cell===height) {return false} break;
 		}
 
 		for (i = 0; i < 64; i++) {
-			if (collide(walls[i], DIRECTION)) {
+			if (object.collide(walls[i], DIRECTION)) {
 				return false;
 			}
 		}
@@ -70,7 +70,7 @@ function movingObj(xposition, yposition, color) {
 
 	}
 
-	function collide(obj, DIRECTION) {
+	object.collide = function(obj, DIRECTION) {
 
 		x1 = object.xposition;
 		x2 = obj.xposition;
@@ -96,30 +96,48 @@ function movingObj(xposition, yposition, color) {
 
 function computerPlayer(xposition, yposition, color) {
 
-	computerMovingObject = new movingObj(xposition, yposition, color);
+	var computerMovingObject = new movingObj(xposition, yposition, color);
 
 	var stepsTaken = 10;
-	setInterval(function(){
-		if (stepsTaken===10) {
-			// DIRECTION = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]
 
-			xDiff = target.xposition - computerMovingObject.xposition
-			yDiff = target.yposition - computerMovingObject.yposition
-			xDiffPrime = Math.abs(xDiff)
-			yDiffPrime = Math.abs(yDiff)
-			if (xDiffPrime>yDiffPrime) {
-				DIRECTION = [xDiff/xDiffPrime, 0]
-			}
-			else {
-				DIRECTION = [0, yDiff/yDiffPrime]
-			}
-			
-			stepsTaken = 0;
-		}
-		computerMovingObject.move(DIRECTION)
-		stepsTaken++;
+	computerMovingObject.evade = function(target) {
+		setInterval(function(){
+			if (stepsTaken===10) {
+				// DIRECTION = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]
 
-	}, 50);
+				xDiff = target.xposition - computerMovingObject.xposition
+				yDiff = target.yposition - computerMovingObject.yposition
+				
+				xDiffPrime = Math.abs(xDiff)
+				yDiffPrime = Math.abs(yDiff)
+				if (xDiffPrime>yDiffPrime) {
+					DIRECTION = [xDiff/xDiffPrime, 0]
+					for (i = 0; i < 64; i++) {
+						if (computerMovingObject.collide(walls[i], DIRECTION)) {
+							DIRECTION = [0, yDiff/yDiffPrime]
+						}
+					}
+				}
+				else {
+					DIRECTION = [0, yDiff/yDiffPrime]
+					for (i = 0; i < 64; i++) {
+						if (computerMovingObject.collide(walls[i], DIRECTION)) {
+							DIRECTION = [xDiff/xDiffPrime, 0]
+						}
+					}
+				}
+				
+				stepsTaken = 0;
+			}
+			computerMovingObject.move(DIRECTION)
+			if(computerMovingObject.collide(target, DIRECTION)) {
+				location.reload();
+			}
+			stepsTaken++;
+
+		}, 50);
+	}
+	
 
 	return computerMovingObject
 
@@ -155,5 +173,6 @@ for (i = 0; i < 64; i++) {
 	walls.push(new obj(wallColumn*cell, wallRow*cell, '#333333'));
 }
 
-target = new obj(300, 300, '#FF0000')
-penny = new computerPlayer(100, 150, '#abffab');
+penny = new computerPlayer(0, 0, '#FF0000');
+howard = new userPlayer(300, 300, '#0000FF');
+penny.evade(howard);
