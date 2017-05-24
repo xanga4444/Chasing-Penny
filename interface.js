@@ -10,6 +10,7 @@ var UP = [0, -1];
 var RIGHT = [1, 0];
 var DOWN = [0, 1];
 var DIRECTIONS = [LEFT, UP, RIGHT, DOWN]
+var HighScore = 0;
 
 
 function obj(xposition, yposition, color) {
@@ -151,10 +152,10 @@ function userPlayer(xposition, yposition, color) {
 	userMovingObject.keyBinding = function(event) {
 
 		switch (event.keyCode) {
-	        case 37: DIRECTION = LEFT; break // LEFT
-		    case 38: DIRECTION = UP; break // UP
-		    case 39: DIRECTION = RIGHT; break // RIGHT
-		    case 40: DIRECTION = DOWN; break // DOWN
+	        case 37: DIRECTION = LEFT; HighScore++; break // LEFT
+		    case 38: DIRECTION = UP; HighScore++; break // UP
+		    case 39: DIRECTION = RIGHT; HighScore++; break // RIGHT
+		    case 40: DIRECTION = DOWN; HighScore++; break // DOWN
 		}
 		
 		userMovingObject.move(DIRECTION);
